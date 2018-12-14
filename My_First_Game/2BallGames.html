@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<body>
+    <header>
+        <title>
+            2BallGames
+        </title>
+        <style>
+            canvas {
+                position: absolute;
+                background: #b9b9b9;
+                /*top: 10%;
+                left: 10%;
+                right: 10%;
+                
+                height: 50% */
+                width: 80%;
+            }
+        </style>
+    </header>
+
+    <body>
+        <canvas id="GamePlace" height="420" width="1024"></canvas>
+        <div style="display:none">
+            <img id='fone' src="fone.jpg" width="1024" height="640">
+            <img id='ball' src="ball.jpg" width="32" height="32">
+            <img id='paddle1' src="paddle1.jpg">
+            <img id='paddle2' src="paddle2.jpg">
+            <img id='brick' src="brick.png">
+        </div>
+    </body>
+
+    <script src="classes.js"></script>
+    <script>
+
+        let canvas = document.getElementById('GamePlace');
+        let ctx = canvas.getContext('2d');
+
+        let fone = document.getElementById('fone');
+        let numBox = 1;
+        let speed = 10;
+        let axeleration = 0;
+        let id = 0;
+
+        const brickList = [AddSpeedBrick, NotAddSpeedBrick, ChangeControlBrick, AddSizeBrick, NotAddSizeBrick]
+        const RandomBrick = function () {
+            let random = Math.round(Math.random() * (brickList.length - 1));
+            let brick = new brickList[random]();
+
+
+            let randomsize = { x: 50 + Math.random() * 100, y: 50 + Math.random() * 100 };
+            brick.setSize(randomsize);
+            let randomposX = canvas.width / 4 + Math.random() * (canvas.width / 2) - brick.size.x;
+            let randomposY = Math.random() * (canvas.height - brick.size.y);
+            brick.setPos({ x: randomposX, y: randomposY });
+
+            brick.setId(++id);
+
+
+            console.log(brick);
+            figureArray.push(brick);
+            return brick;
+        }
+
+        let figureArray = [];
+
+        // let pad = new Paddle();
+        // pad.setPos({ x: canvas.width / 2, y: canvas.height / 2 });
+        // pad.setStep({ dx: 0, dy: 4 });
+        // pad.setColor({ r: 255, g: 0, b: 0 });
+        // figureArray.push(pad);
+
+        let userpad1 = new UserPaddle();
+        userpad1.setPos({ x: 10, y: canvas.height / 2 });
+        userpad1.setControl();
+        userpad1.setColor({ r: 195, g: 66, b: 34 });
+        userpad1.setId(++id);
+        userpad1.Image = document.getElementById('paddle1');
+        figureArray.push(userpad1);
+
+        let userpad2 = new UserPaddle();
+        userpad2.setPos({ x: canvas.width - 40, y: canvas.height / 2 });
+        userpad2.setKeyUp(87);
+        userpad2.setKeyDown(83);
+        userpad2.setKeyRight(68);
+        userpad2.setKeyLeft(65);
+        userpad2.setControl();
+        userpad2.setColor({ r: 49, g: 185, b: 197 });
+        userpad2.setId(++id);
+        userpad2.Image = document.getElementById('paddle2');
+        figureArray.push(userpad2);
+
+        figureArray.push(RandomBrick());
+
+        for (let i = 0; i < numBox; i++) {
+
+
+            figure = new Ball();
+            figure.setStep({ dx: Math.random() * speed - speed / 2, dy: Math.random() * speed - speed / 2 });
+            figure.setPos({ x: Math.round(Math.random() * (0.9 * canvas.width)), y: Math.round(Math.random() * (0.9 * canvas.height)) });
+            figure.setAcceleration(axeleration);
+            figure.setId(++id);
+            figure.setLastPaddle(userpad1);
+            figureArray.push(figure);
+        }
+
+
+
+
+
+
+        let GameLoop = function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(fone, 0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < figureArray.length; i++) {
+                figureArray[i].BoxCollision(figureArray);
+            }
+            for (let i = 0; i < figureArray.length; i++) {
+                figureArray[i].Move();
+                figureArray[i].Draw();
+
+
+
+            }
+
+            requestAnimationFrame(GameLoop);
+        }
+        GameLoop();
+
+
+
+        //setInterval(RandomBrick, 10000);
+
+    </script>
+
+
+</body>
